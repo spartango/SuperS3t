@@ -1,0 +1,34 @@
+// Project: SuperS3t, the Asynchronous, no-frills S3 Library
+version = '0.1'
+
+// Java components
+apply plugin: 'java'
+
+// IDE support
+apply plugin: 'eclipse'
+
+// Language support
+sourceCompatibility = 1.7
+
+// Repositories
+repositories {
+    mavenCentral()
+}
+
+// External dependencies
+dependencies {
+    // Vert.x (Async net & I/O)
+    compile([group: 'org.vert-x', name: 'vertx-core', version: '1.3.0.final'], 
+            [group: 'org.vert-x', name: 'vertx-lang-java', version: '1.3.0.final']) 
+    
+    // Logging
+    compile([group: 'org.slf4j', name: 'slf4j-api', version: '1.6.6'], 
+            [group: 'ch.qos.logback', name: 'logback-core', version: '1.0.7'],
+            [group: 'ch.qos.logback', name: 'logback-classic', version: '1.0.7'])
+    
+    // Junit
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+
+}
+
+defaultTasks 'build'
