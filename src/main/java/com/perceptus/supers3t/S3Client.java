@@ -18,18 +18,25 @@ public class S3Client {
     private final HttpClient   client;
 
     public S3Client() {
-        this(null, null, DEFAULT_ENDPOINT);
+        this(vertx, null, null, DEFAULT_ENDPOINT);
     }
 
     public S3Client(String accessKey, String secretKey) {
-        this(accessKey, secretKey, DEFAULT_ENDPOINT);
+        this(vertx, accessKey, secretKey, DEFAULT_ENDPOINT);
     }
 
     public S3Client(String accessKey, String secretKey, String endpoint) {
+        this(vertx, accessKey, secretKey, endpoint);
+    }
+
+    public S3Client(Vertx vertx,
+                    String accessKey,
+                    String secretKey,
+                    String endpoint) {
         awsAccessKey = accessKey;
         awsSecretKey = secretKey;
 
-        client = vertx.createHttpClient().setHost(endpoint);
+        this.client = vertx.createHttpClient().setHost(endpoint);
     }
 
     // Direct call (async)
