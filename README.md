@@ -45,4 +45,4 @@ The key functionality that SuperS3t provides is handling authentication of reque
 
 ##Build & Test
 
-SuperS3t uses Gradle as its build system, and includes JUnit tests to demonstrate that it works. You can include Rational Option as a subproject in existing build systems, or you can use gradle to generate a jar.
+SuperS3t uses Gradle as its build system, and includes JUnit tests to demonstrate that it works. You can include SuperS3t as a subproject in existing build systems, or you can use gradle to generate a jar.
