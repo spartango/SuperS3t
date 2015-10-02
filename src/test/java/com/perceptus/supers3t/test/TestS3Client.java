@@ -1,55 +1,60 @@
-/**
- * 
- */
 package com.perceptus.supers3t.test;
-
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpClientResponse;
 
 import com.perceptus.supers3t.S3Client;
 import com.perceptus.supers3t.S3ClientRequest;
+import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpClientResponse;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ *
+ * Integration Tests {@link S3Client}.
+ *
+ * To run these tests, set the accessKey, secretKey, s3 bucket, s3 object and change the
+ * assertions to match the data.
+ *
  * @author spartango
  * 
  */
 public class TestS3Client {
-    private static final Logger logger         = LoggerFactory.getLogger(TestS3Client.class);
+    private static final Logger logger = LoggerFactory.getLogger(TestS3Client.class);
 
-    private static final int    expectedLength = 4096;                                       // bytes
+    private static final int expectedLength = 4096; // bytes
 
-    private static final String accessKey      = "";
-    private static final String secretKey      = "";
+    private static final String accessKey = "";
+    private static final String secretKey = "";
 
-    private static final String testBucket     = "Perceptus";
+    private static final String testBucket = "Perceptus";
 
-    private S3Client            client;
+    private S3Client client;
 
     /**
      * @throws java.lang.Exception
      */
-    @Before public void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         client = new S3Client(accessKey, secretKey);
     }
 
     /**
      * Test method for
-     * {@link com.perceptus.supers3t.S3Client#get(java.lang.String, java.lang.String, org.vertx.java.core.Handler)}
-     * .
+     * {@link com.perceptus.supers3t.S3Client#get(java.lang.String, java.lang.String, io.vertx.core.Handler)}
      */
+    @Test
+    @Ignore
     public void testGet() {
         // Put a test object up
 
         // Things we need from the response
-        final Buffer responseBody = new Buffer();
+        final Buffer responseBody = Buffer.buffer();
         final AtomicInteger responseCode = new AtomicInteger();
 
         synchronized (responseBody) {
@@ -59,12 +64,12 @@ public class TestS3Client {
 
                            @Override public void
                                    handle(HttpClientResponse event) {
-                               responseCode.set(event.statusCode);
-                               if (event.statusCode != 200) {
+                               responseCode.set(event.statusCode());
+                               if (event.statusCode() != 200) {
                                    synchronized (responseBody) {
                                        // This is a failed request
                                        logger.error("Bad response: "
-                                                    + event.statusCode);
+                                                    + event.statusCode());
                                        responseBody.notify();
                                    }
                                    return;
@@ -100,25 +105,28 @@ public class TestS3Client {
 
     /**
      * Test method for
-     * {@link com.perceptus.supers3t.S3Client#put(java.lang.String, java.lang.String, org.vertx.java.core.buffer.Buffer, org.vertx.java.core.Handler)}
+     * {@link com.perceptus.supers3t.S3Client#put(java.lang.String, java.lang.String, io.vertx.core.buffer.Buffer, io.vertx.core.Handler)}
      * .
      */
+    @Test
+    @Ignore
     public void testPut() {
         // Things we need from the response
         final AtomicInteger responseCode = new AtomicInteger();
 
         synchronized (responseCode) {
             client.put(testBucket,
-                       "testObject",
-                       new Buffer(new byte[expectedLength]),
-                       new Handler<HttpClientResponse>() {
-                           @Override public void
-                                   handle(HttpClientResponse event) {
-                               synchronized (responseCode) {
-                                   responseCode.set(event.statusCode);
-                                   responseCode.notify();
-                               }
-                           }
+                    "testObject",
+                    Buffer.buffer(new byte[expectedLength]),
+                    new Handler<HttpClientResponse>() {
+                        @Override
+                        public void
+                        handle(HttpClientResponse event) {
+                            synchronized (responseCode) {
+                                responseCode.set(event.statusCode());
+                                responseCode.notify();
+                            }
+                        }
                        });
 
             try {
@@ -134,9 +142,11 @@ public class TestS3Client {
 
     /**
      * Test method for
-     * {@link com.perceptus.supers3t.S3Client#delete(java.lang.String, java.lang.String, org.vertx.java.core.Handler)}
+     * {@link com.perceptus.supers3t.S3Client#delete(java.lang.String, java.lang.String, io.vertx.core.Handler)}
      * .
      */
+    @Test
+    @Ignore
     public void testDelete() {
         // Things we need from the response
         final AtomicInteger responseCode = new AtomicInteger();
@@ -148,7 +158,7 @@ public class TestS3Client {
                               @Override public void
                                       handle(HttpClientResponse event) {
                                   synchronized (responseCode) {
-                                      responseCode.set(event.statusCode);
+                                      responseCode.set(event.statusCode());
                                       responseCode.notify();
                                   }
                               }
@@ -167,14 +177,16 @@ public class TestS3Client {
 
     /**
      * Test method for
-     * {@link com.perceptus.supers3t.S3Client#createPutRequest(java.lang.String, java.lang.String, org.vertx.java.core.Handler)}
+     * {@link com.perceptus.supers3t.S3Client#createPutRequest(java.lang.String, java.lang.String, io.vertx.core.Handler)}
      * .
      */
-    @Test public void testCreatePutRequest() {
+    @Test
+    @Ignore //uncomment to run with your bucket, access key, secret key
+    public void testCreatePutRequest() {
         // Things we need from the response
         final AtomicInteger responseCode = new AtomicInteger();
 
-        final Buffer toUpload = new Buffer(new byte[expectedLength]);
+        final Buffer toUpload = Buffer.buffer(new byte[expectedLength]);
         synchronized (responseCode) {
             S3ClientRequest request = client.createPutRequest(testBucket,
                                                               "testObject",
@@ -182,10 +194,10 @@ public class TestS3Client {
                                                                   @Override public void
                                                                           handle(HttpClientResponse event) {
                                                                       logger.info("Response message: "
-                                                                                  + event.statusMessage);
+                                                                                  + event.statusMessage());
 
                                                                       synchronized (responseCode) {
-                                                                          responseCode.set(event.statusCode);
+                                                                          responseCode.set(event.statusCode());
                                                                           responseCode.notify();
                                                                       }
                                                                   }
@@ -204,15 +216,17 @@ public class TestS3Client {
 
     /**
      * Test method for
-     * {@link com.perceptus.supers3t.S3Client#createGetRequest(java.lang.String, java.lang.String, org.vertx.java.core.Handler)}
+     * {@link com.perceptus.supers3t.S3Client#createGetRequest(java.lang.String, java.lang.String, io.vertx.core.Handler)}
      * .
      */
-    @Test public void testCreateGetRequest() {
+    @Test
+    @Ignore
+    public void testCreateGetRequest() {
         // Do a testPut first
         testPut();
 
         // Things we need from the response
-        final Buffer responseBody = new Buffer();
+        final Buffer responseBody = Buffer.buffer();
         final AtomicInteger responseCode = new AtomicInteger();
 
         synchronized (responseBody) {
@@ -222,8 +236,8 @@ public class TestS3Client {
 
                                                                   @Override public void
                                                                           handle(HttpClientResponse event) {
-                                                                      responseCode.set(event.statusCode);
-                                                                      if (event.statusCode != 200) {
+                                                                      responseCode.set(event.statusCode());
+                                                                      if (event.statusCode() != 200) {
                                                                           synchronized (responseBody) {
                                                                               // This
                                                                               // is
@@ -231,7 +245,7 @@ public class TestS3Client {
                                                                               // failed
                                                                               // request
                                                                               logger.error("Bad response: "
-                                                                                           + event.statusCode);
+                                                                                           + event.statusCode());
                                                                               responseBody.notify();
                                                                           }
                                                                           return;
@@ -274,10 +288,12 @@ public class TestS3Client {
 
     /**
      * Test method for
-     * {@link com.perceptus.supers3t.S3Client#createDeleteRequest(java.lang.String, java.lang.String, org.vertx.java.core.Handler)}
+     * {@link com.perceptus.supers3t.S3Client#createDeleteRequest(java.lang.String, java.lang.String, io.vertx.core.Handler)}
      * .
      */
-    @Test public void testCreateDeleteRequest() {
+    @Test
+    @Ignore
+    public void testCreateDeleteRequest() {
         // Test put may be required
         testPut();
 
@@ -291,7 +307,7 @@ public class TestS3Client {
                                                                      @Override public void
                                                                              handle(HttpClientResponse event) {
                                                                          synchronized (responseCode) {
-                                                                             responseCode.set(event.statusCode);
+                                                                             responseCode.set(event.statusCode());
                                                                              responseCode.notify();
                                                                          }
                                                                      }
@@ -309,7 +325,9 @@ public class TestS3Client {
         Assert.assertEquals(204, responseCode.intValue());
     }
 
-    @Test public void testLifeCycle() {
+    @Test
+    @Ignore
+    public void testLifeCycle() {
         testPut();
         testGet();
         testDelete();
