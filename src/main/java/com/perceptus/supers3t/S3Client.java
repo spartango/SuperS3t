@@ -17,33 +17,34 @@ public class S3Client {
     public static final String DEFAULT_ENDPOINT = "s3-us-west-1.amazonaws.com";
     private static final Logger logger = LoggerFactory.getLogger(S3Client.class);
 
-    private static final Vertx vertx = Vertx.vertx();
+
 
     private final String awsAccessKey;
     private final String awsSecretKey;
+    private final String awsSessionToken;
 
     private final HttpClient client;
 
     public S3Client() {
-        this(vertx, null, null, DEFAULT_ENDPOINT);
+        this(null, null);
     }
 
     public S3Client(String accessKey, String secretKey) {
-        this(vertx, accessKey, secretKey, DEFAULT_ENDPOINT);
+        this(Vertx.vertx(), accessKey, secretKey, null, DEFAULT_ENDPOINT);
     }
 
-    public S3Client(String accessKey, String secretKey, String endpoint) {
-        this(vertx, accessKey, secretKey, endpoint);
+    public S3Client(String accessKey, String secretKey, String sessionToken, String endpoint) {
+        this(Vertx.vertx(), accessKey, secretKey, sessionToken, endpoint);
     }
 
-    public S3Client(Vertx vertx,
-                    String accessKey,
-                    String secretKey,
-                    String endpoint) {
+
+    public S3Client(Vertx vertx, String accessKey, String secretKey, String sessionToken, String endpoint) {
         awsAccessKey = accessKey;
         awsSecretKey = secretKey;
+        awsSessionToken = sessionToken;
 
         this.client = vertx.createHttpClient(new HttpClientOptions().setDefaultHost(endpoint));
+
     }
 
     // Direct call (async)
@@ -137,7 +138,8 @@ public class S3Client {
                 key,
                 httpRequest,
                 awsAccessKey,
-                awsSecretKey);
+                awsSecretKey,
+                awsSessionToken);
     }
 
     // create GET -> request Object
@@ -152,7 +154,8 @@ public class S3Client {
                 key,
                 httpRequest,
                 awsAccessKey,
-                awsSecretKey);
+                awsSecretKey,
+                awsSessionToken);
     }
 
     // create DELETE -> request Object
@@ -167,7 +170,8 @@ public class S3Client {
                 key,
                 httpRequest,
                 awsAccessKey,
-                awsSecretKey);
+                awsSecretKey,
+                awsSessionToken);
     }
 
     public void close() {

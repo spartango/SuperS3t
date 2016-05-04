@@ -16,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
+import java.util.StringJoiner;
 
 public class S3ClientRequest implements HttpClientRequest {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
@@ -31,25 +32,16 @@ public class S3ClientRequest implements HttpClientRequest {
     // These are totally optional
     private String contentMd5;
     private String contentType;
-
     // Used for authentication(which may be optional depending on the bucket)
     private String awsAccessKey;
     private String awsSecretKey;
+    private String awsSessionToken;
 
     public S3ClientRequest(String method,
                            String bucket,
                            String key,
                            HttpClientRequest request) {
-        this(method, bucket, key, request, null, null);
-    }
-
-    public S3ClientRequest(String method,
-                           String bucket,
-                           String key,
-                           HttpClientRequest request,
-                           String awsAccessKey,
-                           String awsSecretKey) {
-        this(method, bucket, key, request, awsAccessKey, awsSecretKey, "", "");
+        this(method, bucket, key, request, null, null, null);
     }
 
     public S3ClientRequest(String method,
@@ -58,6 +50,17 @@ public class S3ClientRequest implements HttpClientRequest {
                            HttpClientRequest request,
                            String awsAccessKey,
                            String awsSecretKey,
+                           String awsSessionToken) {
+        this(method, bucket, key, request, awsAccessKey, awsSecretKey, awsSessionToken, "", "");
+    }
+
+    public S3ClientRequest(String method,
+                           String bucket,
+                           String key,
+                           HttpClientRequest request,
+                           String awsAccessKey,
+                           String awsSecretKey,
+                           String awsSessionToken,
                            String contentMd5,
                            String contentType) {
         this.method = method;
@@ -66,6 +69,7 @@ public class S3ClientRequest implements HttpClientRequest {
         this.request = request;
         this.awsAccessKey = awsAccessKey;
         this.awsSecretKey = awsSecretKey;
+        this.awsSessionToken = awsSessionToken;
         this.contentMd5 = contentMd5;
         this.contentType = contentType;
     }
@@ -203,8 +207,17 @@ public class S3ClientRequest implements HttpClientRequest {
             // inconsistent
             String xamzdate = currentDateString();
             headers().add("X-Amz-Date", xamzdate);
+            if (!isSessionTokenBlank()) {
+                headers().add("X-Amz-Security-Token", awsSessionToken);
+            }
 
-            String canonicalizedAmzHeaders = "x-amz-date:" + xamzdate + "\n";
+            final StringJoiner canonicalizedAmzHeadersBuilder = new StringJoiner("\n", "", "\n");
+            canonicalizedAmzHeadersBuilder.add("x-amz-date:" + xamzdate);
+
+            if (!isSessionTokenBlank()) {
+                canonicalizedAmzHeadersBuilder.add("x-amz-security-token:" + awsSessionToken);
+            }
+            String canonicalizedAmzHeaders = canonicalizedAmzHeadersBuilder.toString();
             String canonicalizedResource = "/" + bucket + "/" + key;
 
             String toSign = method
@@ -232,6 +245,10 @@ public class S3ClientRequest implements HttpClientRequest {
             headers().add("Authorization", authorization);
         }
         // Otherwise not needed
+    }
+
+    private boolean isSessionTokenBlank() {
+        return awsSessionToken == null || awsSessionToken.trim().length() == 0;
     }
 
     public boolean isAuthenticated() {
