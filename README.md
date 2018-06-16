@@ -3,17 +3,17 @@ SuperS3t
 
 *An asynchronous, vert.x-based S3 library for Java* 
 
-##About
+## About
 
 SuperS3t is a super simple library for [Amazon Web Services' Simple Storage Service (S3)](http://aws.amazon.com/s3/). It provides commonly-used functionality for manipulating objects in S3 buckets, such as creating, downloading, and deleting objects. Critically, SuperS3t's API is asynchronous and built on the fast I/O substrate, [Vert.x](http://vertx.io). 
 
 SuperS3t is very fast, and compatible with applications using Vert.x, Netty, or Java's NIO/2 APIs.
 
-##Motivation
+## Motivation
 
 We built SuperS3t out of a need of our own; previously our Application had been using the excellent [JetS3t](http://www.jets3t.org) Library to interface with S3. Our application is built with Vert.x, and thus architected with asynchronous calls everywhere. Unfortunately, JetS3t provides only a synchronous API, and it is incompatible with NIO and Vertx. We found ourselves incurring buffer copy penalties as we moved data between NIO buffers and input/outputstreams, and our code got uglier and uglier. 
 
-##Features
+## Features
 
 SuperS3t is little more than a wrapper around Vertx's [HttpClient API](http://vertx.io/core_manual_java.html#writing-http-clients). You can use it to PUT, GET, and DELETE objects from S3. You use it in much the same way as you would a normal HTTPClient:
 
@@ -43,6 +43,6 @@ These end the request as part of the call, sending it off and calling the handle
 
 The key functionality that SuperS3t provides is handling authentication of requests to and from S3; SuperS3t will automatically sign requests right as they are ready to be sent.
 
-##Build & Test
+## Build & Test
 
 SuperS3t uses Gradle as its build system, and includes JUnit tests to demonstrate that it works. You can include SuperS3t as a subproject in existing build systems, or you can use gradle to generate a jar.
